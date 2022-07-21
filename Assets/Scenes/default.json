@@ -38,6 +38,9 @@
             {
                 "type": "Sprite",
                 "path": "Assets/Textures/King_stay.png"
+            },
+            {
+                "type": "Animation_control"
             }
         ]
     ]

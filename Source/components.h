@@ -6,90 +6,90 @@
 #include <typeindex>
 #include <raylib-ext.hpp>
 
-namespace plat {
-
-typedef int Entity_id;
-
-class Storage;
-
-class Component 
+namespace plat
 {
-public:
-    virtual void update(float dt, Entity_id parent_id, Storage &storage) = 0;
-    virtual std::string get_component_type() = 0;
-};
+    typedef int Entity_id;
 
-class Entity 
-{
-public:
-    Entity_id id;
-    std::vector<Component *> components;
+    class Storage;
 
-    Entity();
-
-    template <typename T> 
-    T *
-    getComponent()
+    class Component 
     {
-        for (int i = 0; i < components.size(); i++)
+    public:
+        virtual void update(float dt, Entity_id parent_id, Storage &storage) = 0;
+        virtual std::string get_component_type() = 0;
+    };
+
+    class Entity 
+    {
+    public:
+        Entity_id id;
+        std::vector<Component *> components;
+
+        Entity();
+
+        template <typename T> 
+        T *
+        getComponent()
         {
-            if (std::type_index(typeid(T)).name() == components[i]->get_component_type())
+            for (int i = 0; i < components.size(); i++)
             {
-                return (T *) components[i];
+                if (std::type_index(typeid(T)).name() == components[i]->get_component_type())
+                {
+                    return (T *) components[i];
+                }
             }
+
+            return nullptr;
         }
+    };
 
-        return nullptr;
-    }
-};
+    class Storage
+    {
+    public:
+        std::vector<Entity> entities;
+        plat::Entity_id cur_camera;
+    };
 
-class Storage
-{
-public:
-    std::vector<Entity> entities;
-    plat::Entity_id cur_camera;
-};
+    class Sprite : public Component 
+    {
+    public:
+        Texture2D texture;
+        Image image;
 
-class Sprite : public Component 
-{
-public:
-    Texture2D texture;
-    Image image;
+        Sprite(const std::string& path);
+        std::string get_component_type() override;
+        void update(float dt, Entity_id parent_id, Storage &storage) override;
+    };
 
-    Sprite(const std::string& path);
-    std::string get_component_type() override;
-    void update(float dt, Entity_id parent_id, Storage &storage) override;
-};
+    class Transform : public Component 
+    {
+    public:
+        Vector3 pos;
+        Vector2 scale;
+        float angle;
 
-class Transform : public Component 
-{
-public:
-    Vector3 pos;
-    Vector2 scale;
-    float angle;
+        void update(float dt, Entity_id parent_id, Storage &storage) override;
+        std::string get_component_type() override;
+    };
 
-    void update(float dt, Entity_id parent_id, Storage &storage) override;
-    std::string get_component_type() override;
-};
+    class Player_control : public Component 
+    {
+    public:
+        int speed;
+        Vector2 move_direction;
+        bool attack_triger;
+        void update(float dt, Entity_id parent_id, Storage &storage) override;
+        std::string get_component_type() override;
+    };
 
-class Player_control : public Component 
-{
-public:
-    int speed;
+    class Camera : public Component
+    {
+    public:
+        Vector2 scale = {1, 1};
 
-    void update(float dt, Entity_id parent_id, Storage &storage) override;
-    std::string get_component_type() override;
-};
-
-class Camera : public Component
-{
-public:
-    Vector2 scale = {1, 1};
-
-    void update(float dt, Entity_id parent_id, Storage &storage) override;
-    std::string get_component_type() override;
-};
-
+        void update(float dt, Entity_id parent_id, Storage &storage) override;
+        std::string get_component_type() override;
+    };
 } // namespace plat
 
 /*

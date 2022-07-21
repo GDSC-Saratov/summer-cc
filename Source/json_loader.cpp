@@ -2,8 +2,7 @@
 
 using json = nlohmann::json;
 
-plat::Storage
-load_lvl(std::string path)
+plat::Storage load_lvl(std::string path)
 {
     plat::Storage new_lvl;
     std::ifstream lvl_file(path);
@@ -19,15 +18,8 @@ load_lvl(std::string path)
             {
                 plat::Transform *transform = new plat::Transform();
                 transform->angle = component["angle"];
-                transform->pos = Vector3 {
-                    component["pos"][0],
-                    component["pos"][1],
-                    component["pos"][2]
-                };
-                transform->scale = Vector2 {
-                    component["scale"][0],
-                    component["scale"][1]
-                };
+                transform->pos = Vector3 {component["pos"][0], component["pos"][1], component["pos"][2]};
+                transform->scale = Vector2 {component["scale"][0], component["scale"][1]};
                 new_lvl.entities.back().components.push_back(transform);
             }
             else if (component["type"] == "PlayerControl")
@@ -38,19 +30,19 @@ load_lvl(std::string path)
             }
             else if (component["type"] == "Sprite")
             {
-                new_lvl.entities.back().components.push_back(
-                    new plat::Sprite(std::string(component["path"]))
-                );
+                new_lvl.entities.back().components.push_back(new plat::Sprite(std::string(component["path"])));
             }
             else if (component["type"] == "Camera")
             {
                 plat::Camera *cam = new plat::Camera();
-                cam->scale = Vector2 {
-                    component["scale"][0],
-                    component["scale"][1]
-                };
+                cam->scale = Vector2 {component["scale"][0], component["scale"][1]};
                 new_lvl.entities.back().components.push_back(cam);
                 new_lvl.cur_camera = new_lvl.entities.size() - 1;
+            }
+            else if (component["type"] == "Animation_control")
+            {
+                plat::Animation_control *animation_control = new plat::Animation_control();
+                new_lvl.entities.back().components.push_back(animation_control);
             }
         }
     }
